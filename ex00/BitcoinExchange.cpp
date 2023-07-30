@@ -6,11 +6,12 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:41:17 by corellan          #+#    #+#             */
-/*   Updated: 2023/07/30 19:28:11 by corellan         ###   ########.fr       */
+/*   Updated: 2023/07/30 22:12:07 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "BitcoinExchange.hpp"
+#include <iostream>
 
 BitcoinExchange::BitcoinExchange(std::string &input_file)
 {
@@ -22,8 +23,8 @@ BitcoinExchange::BitcoinExchange(std::string &input_file)
 	this->_file.open(input_file, std::ifstream::in);
 	if (this->_file.fail() == true)
 		throw (ErrorOpeningFile());
-	if (this->_checkFormatDatabase() == -1)
-		throw (WrongFormatDatabase());
+	/*if (this->_checkFormatDatabase() == -1)
+		throw (WrongFormatDatabase());*/
 	if (this->_checkFormatFile() == -1)
 		throw (WrongFormatFile());
 	return ;
@@ -44,7 +45,14 @@ int	BitcoinExchange::_checkFormatFile(void)
 {
 	if (this->_storeDoc(this->_file, this->_file_doc, this->_lines_file) == -1)
 		return (-1);
-	
+	if (this->_lines_file < 2)
+		return (-1);
+	this->_parsed_file = this->_parseLines(this->_file_doc, this->_lines_file);
+	if (!this->_parsed_file)
+		return (-1);
+	if (this->_parsed_file[0].compare("date | value"))
+		return (-1);
+	return (0);
 }
 
 int	BitcoinExchange::_storeDoc(std::ifstream &file, std::string &doc, int &lines)
@@ -54,16 +62,8 @@ int	BitcoinExchange::_storeDoc(std::ifstream &file, std::string &doc, int &lines
 
 	flag = 0;
 	lines = 0;
-	while(1)
+	while(std::getline(file, temp))
 	{
-		std::getline(file, temp);
-		if (file.eof() == true)
-			break ;
-		if (file.fail() == true)
-		{
-			flag = 2;
-			break ;
-		}
 		if (flag == 0)
 		{
 			doc = temp;
@@ -75,33 +75,39 @@ int	BitcoinExchange::_storeDoc(std::ifstream &file, std::string &doc, int &lines
 		doc += '\n';
 		file.sync();
 	}
-	file.sync();
-	if (flag == 2)
+	if (file.eof() == true)
+		return (0);
+	else if (file.fail() == true)
 		return (-1);
 	return (0);
 }
 
-int	BitcoinExchange::_parseLines(std::string *ptr, std::string &doc, int &lines)
+std::string	*BitcoinExchange::_parseLines(std::string &doc, int &lines)
 {
-	int	i;
-	int	pos;
+	int			i;
+	int			pos;
+	std::string	temp;
+	std::string	*ptr;
 
 	i = 0;
 	pos = 0;
+	temp = doc;
 	try
 	{
 		ptr = new std::string[lines];
 	}
 	catch(const std::exception& e)
 	{
-		return (-1);
+		return (NULL);
 	}
-	while (doc.find('\n') != std::string::npos)
+	while (temp.find('\n') != std::string::npos)
 	{
-		pos = doc.find('\n');
-		ptr[i] = doc.substr(0, pos);
+		pos = temp.find('\n');
+		ptr[i] = temp.substr(0, pos);
 		i++;
+		temp = temp.substr(pos + 1);
 	}
+	return (ptr);
 }
 
 const char	*BitcoinExchange::ErrorOpeningDatabase::what(void) const throw()

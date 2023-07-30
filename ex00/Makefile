@@ -6,19 +6,19 @@
 #    By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/09 10:37:08 by corellan          #+#    #+#              #
-#    Updated: 2023/07/29 14:30:52 by corellan         ###   ########.fr        #
+#    Updated: 2023/07/30 21:31:12 by corellan         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = btc
 
-SRC = main.cpp
+SRC = main.cpp BitcoinExchange.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
 CC = c++
 
-FLAGS = -Wall -Wextra -Werror -std=c++98
+FLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g -static-libsan
 
 RED = \033[0;31m
 

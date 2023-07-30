@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:50:32 by corellan          #+#    #+#             */
-/*   Updated: 2023/07/30 16:28:41 by corellan         ###   ########.fr       */
+/*   Updated: 2023/07/30 22:10:08 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,10 @@ private:
 
 	BitcoinExchange	operator=(BitcoinExchange const &rhs);
 
-	int		_checkFormatDatabase(void);
-	int		_checkFormatFile(void);
-	int		_storeDoc(std::ifstream &file, std::string &doc, int &lines);
-	int		_parseLines(std::string *ptr, std::string &doc, int &lines);
+	int				_checkFormatDatabase(void);
+	int				_checkFormatFile(void);
+	int				_storeDoc(std::ifstream &file, std::string &doc, int &lines);
+	std::string		*_parseLines(std::string &doc, int &lines);
 };
 
 #endif

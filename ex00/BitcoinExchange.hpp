@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:50:32 by corellan          #+#    #+#             */
-/*   Updated: 2023/07/30 22:10:08 by corellan         ###   ########.fr       */
+/*   Updated: 2023/07/31 15:35:34 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ private:
 	int				_checkFormatDatabase(void);
 	int				_checkFormatFile(void);
 	int				_storeDoc(std::ifstream &file, std::string &doc, int &lines);
+	int				_checkLineFormatFile(std::string const &line);
 	std::string		*_parseLines(std::string &doc, int &lines);
 };
 

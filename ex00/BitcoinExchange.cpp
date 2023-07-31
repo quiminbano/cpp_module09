@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:41:17 by corellan          #+#    #+#             */
-/*   Updated: 2023/07/30 22:12:07 by corellan         ###   ########.fr       */
+/*   Updated: 2023/07/31 16:09:45 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,9 @@ BitcoinExchange::~BitcoinExchange(void)
 
 int	BitcoinExchange::_checkFormatFile(void)
 {
+	int	i;
+
+	i = 1;
 	if (this->_storeDoc(this->_file, this->_file_doc, this->_lines_file) == -1)
 		return (-1);
 	if (this->_lines_file < 2)
@@ -52,6 +55,12 @@ int	BitcoinExchange::_checkFormatFile(void)
 		return (-1);
 	if (this->_parsed_file[0].compare("date | value"))
 		return (-1);
+	while (i < this->_lines_file)
+	{
+		if (this ->_checkLineFormatFile(this->_parsed_file[i]) == -1)
+			return (-1);
+		i++;
+	}
 	return (0);
 }
 
@@ -108,6 +117,41 @@ std::string	*BitcoinExchange::_parseLines(std::string &doc, int &lines)
 		temp = temp.substr(pos + 1);
 	}
 	return (ptr);
+}
+
+int	BitcoinExchange::_checkLineFormatFile(std::string const &line)
+{
+	size_t	i;
+
+	i = 0;
+	while (std::isdigit(line[i]))
+		i++;
+	if (i == 0 || line[i] != '-')
+		return (-1);
+	i++;
+	while (std::isdigit(line[i]))
+		i++;
+	if (line[i] != '-')
+		return (-1);
+	i++;
+	while (std::isdigit(line[i]))
+		i++;
+	if (line[i] != ' ')
+		return (-1);
+	i++;
+	if (line[i] != '|')
+		return (-1);
+	i++;
+	if (line[i] != ' ')
+		return (-1);
+	i++;
+	if (line[i] == '+' || line[i] == '-')
+		i++;
+	while (std::isdigit(line[i]))
+		i++;
+	if (i < line.size())
+		return (-1);
+	return (0);
 }
 
 const char	*BitcoinExchange::ErrorOpeningDatabase::what(void) const throw()

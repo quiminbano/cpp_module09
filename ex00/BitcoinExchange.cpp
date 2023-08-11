@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:41:17 by corellan          #+#    #+#             */
-/*   Updated: 2023/07/31 16:09:45 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/11 19:06:05 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ BitcoinExchange::BitcoinExchange(std::string &input_file)
 	this->_file.open(input_file, std::ifstream::in);
 	if (this->_file.fail() == true)
 		throw (ErrorOpeningFile());
-	/*if (this->_checkFormatDatabase() == -1)
-		throw (WrongFormatDatabase());*/
+	if (this->_checkFormatDatabase() == -1)
+		throw (WrongFormatDatabase());
 	if (this->_checkFormatFile() == -1)
 		throw (WrongFormatFile());
 	return ;
@@ -41,9 +41,34 @@ BitcoinExchange::~BitcoinExchange(void)
 	return ;
 }
 
+int	BitcoinExchange::_checkFormatDatabase(void)
+{
+	size_t	i;
+
+	i = 1;
+	if (this->_storeDoc(this->_database, this->_database_doc, this->_lines_database) == -1)
+		return (-1);
+	if (this->_lines_database < 2)
+		return (-1);
+	this->_parsed_database = this->_parseLines(this->_database_doc, this->_lines_database);
+	if (!this->_parsed_database)
+		return (-1);
+	if (this->_parsed_database[0].compare("date,exchange_rate"))
+		return (-1);
+	while (i < this->_lines_database)
+	{
+		if (this ->_checkLineFormatDatabase(this->_parsed_database[i]) == -1)
+			return (-1);
+		i++;
+	}
+	if (_checkDateDatabase() == -1)
+		return (-1);
+	return (0);
+}
+
 int	BitcoinExchange::_checkFormatFile(void)
 {
-	int	i;
+	size_t	i;
 
 	i = 1;
 	if (this->_storeDoc(this->_file, this->_file_doc, this->_lines_file) == -1)
@@ -64,7 +89,7 @@ int	BitcoinExchange::_checkFormatFile(void)
 	return (0);
 }
 
-int	BitcoinExchange::_storeDoc(std::ifstream &file, std::string &doc, int &lines)
+int	BitcoinExchange::_storeDoc(std::ifstream &file, std::string &doc, size_t &lines)
 {
 	std::string	temp;
 	int			flag;
@@ -91,7 +116,7 @@ int	BitcoinExchange::_storeDoc(std::ifstream &file, std::string &doc, int &lines
 	return (0);
 }
 
-std::string	*BitcoinExchange::_parseLines(std::string &doc, int &lines)
+std::string	*BitcoinExchange::_parseLines(std::string &doc, size_t &lines)
 {
 	int			i;
 	int			pos;
@@ -117,6 +142,42 @@ std::string	*BitcoinExchange::_parseLines(std::string &doc, int &lines)
 		temp = temp.substr(pos + 1);
 	}
 	return (ptr);
+}
+
+int	BitcoinExchange::_checkLineFormatDatabase(std::string const &line)
+{
+	size_t	i;
+
+	i = 0;
+	while (std::isdigit(line[i]))
+		i++;
+	if (i == 0 || line[i] != '-')
+		return (-1);
+	i++;
+	while (std::isdigit(line[i]))
+		i++;
+	if (line[i] != '-')
+		return (-1);
+	i++;
+	while (std::isdigit(line[i]))
+		i++;
+	if (line[i] != ',')
+		return (-1);
+	i++;
+	if (line[i] == 0)
+		return (-1);
+	while (std::isdigit(line[i]))
+		i++;
+	if (line[i] != 0 && line[i] != '.')
+		return (-1);
+	else if (line[i] == 0)
+		return (0);
+	i++;
+	while (std::isdigit(line[i]))
+		i++;
+	if (i < line.size())
+		return (-1);
+	return (0);
 }
 
 int	BitcoinExchange::_checkLineFormatFile(std::string const &line)
@@ -150,6 +211,74 @@ int	BitcoinExchange::_checkLineFormatFile(std::string const &line)
 	while (std::isdigit(line[i]))
 		i++;
 	if (i < line.size())
+		return (-1);
+	return (0);
+}
+
+int	BitcoinExchange::_checkDateDatabase(void)
+{
+	size_t			i;
+	std::string		temp;
+	size_t			position;
+	unsigned int	year;
+	unsigned int	month;
+	unsigned int	day;
+
+	i = 1;
+	temp.clear();
+	while (i < _lines_database)
+	{
+		position = _findSpaceOrDash(_parsed_database[i]);
+		temp = _parsed_database[i].substr(0, position);
+		std::istringstream	iss;
+		iss.str(temp);
+		iss >> year;
+		if (iss.fail() == true)
+			return (-1);
+		if (year > 2023 || year < 2009)
+			return (-1);
+		temp.clear();
+		temp = _parsed_database[i].substr((position + 1), _findSpaceOrDash(_parsed_database[i].substr((position + 1))));
+		std::istringstream	iss2;
+		iss2.str(temp);
+		iss2 >> month;
+		if (iss.fail() == true || month > 12)
+			return (-1);
+		position += (_findSpaceOrDash(_parsed_database[i].substr((position + 1))) + 1);
+		temp = _parsed_database[i].substr((position + 1), _findSpaceOrDash(_parsed_database[i].substr((position + 1))));
+		std::istringstream	iss3;
+		iss3.str(temp);
+		iss3 >> day;
+		if (iss.fail() == true || day > 31 || _checkYearMonthDatabase(month, day, year) == -1)
+			return (-1);
+		i++;
+	}
+	return (0);
+}
+
+size_t	BitcoinExchange::_findSpaceOrDash(std::string const &input)
+{
+	size_t	i;
+
+	i = 0;
+	while (input[i] && input[i] != '-' && input[i] != ' ')
+		i++;
+	return (i);
+}
+
+int	BitcoinExchange::_checkYearMonthDatabase(unsigned int &month, unsigned int &day, unsigned int &year)
+{
+	if ((month < 8 && (month % 2)) && (day > 31))
+		return (-1);
+	else if ((month >= 8 && !(month % 2)) && (day > 31))
+		return (-1);
+	else if ((month == 2 && !(year % 4)) && (day == 29))
+		return (0);
+	else if ((month == 2 && (day > 28)))
+		return (-1);
+	else if ((month < 8 && !(month % 2)) && (day > 30))
+		return (-1);
+	else if ((month >= 8 && (month % 2)) && (day > 30))
 		return (-1);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:41:17 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/12 17:58:51 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/12 22:06:35 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,6 +202,12 @@ int	BitcoinExchange::_checkLineFormatFile(std::string const &line)
 		i++;
 	while (std::isdigit(line[i]))
 		i++;
+	if (line[i] != '.' && line[i] != 0)
+		return (-1);
+	if (line[i] != 0)
+		i++;
+	while (std::isdigit(line[i]))
+		i++;
 	if (i < line.size())
 		return (-1);
 	return (0);
@@ -321,12 +327,6 @@ void	BitcoinExchange::_processData(void)
 			i++;
 			continue ;
 		}
-		if (year < _minYear)
-		{
-			std::cout << "Error: bad input => " << _parsed_file[i] << std::endl;
-			i++;
-			continue ;
-		}
 		temp.clear();
 		temp = _parsed_file[i].substr((position + 1), _findSpaceOrDash(_parsed_file[i].substr((position + 1))));
 		std::istringstream	iss2;
@@ -374,12 +374,26 @@ void	BitcoinExchange::_processData(void)
 			i++;
 			continue ;
 		}
-		/*if (_searchInDatabase(year, month, day, data) == -1)
+		if (year < _minYear)
 		{
-			std::cout << "Error: not possible to find in database" << std::endl;
+			std::cout << "Error: the data is older than the first entrance in the database" << std::endl;
 			i++;
 			continue ;
-		}*/
+		}
+		else if (year == _minYear && month < _minMonth)
+		{
+			std::cout << "Error: the data is older than the first entrance in the database" << std::endl;
+			i++;
+			continue ;
+		}
+		else if (year == _minYear && month == _minMonth && day < _minDay)
+		{
+			std::cout << "Error: the data is older than the first entrance in the database" << std::endl;
+			i++;
+			continue ;
+		}
+		_searchInDatabase(year, month, day, data);
+		std::cout << _parsed_file[i].substr(0, _parsed_file[i].find(' ')) << " => " << data << " = " << _result << std::endl;
 		i++;
 	}
 }
@@ -442,7 +456,71 @@ void	BitcoinExchange::_findMinimunDatabase(void)
 		}
 		it3++;
 	}
-	std::cout << "min year:" << _minYear << ". min month:" << _minMonth << ". min day:" << _minDay << std::endl;
+}
+
+int	BitcoinExchange::_searchInDatabase(unsigned int &year, unsigned int &month, unsigned int &day, float const &data)
+{
+	int		flag;
+	float	temp;
+
+	flag = 0;
+	temp = 0;
+	while (year > 0 && month > 0 && day > 0)
+	{
+		if (_map_database.find(year) == _map_database.end())
+		{
+			year--;
+			if (year == 0)
+				break ;
+			month = 12;
+			day = 31;
+			continue ;
+		}
+		else if (_map_database.find(year)->second.find(month) == _map_database.find(year)->second.end())
+		{
+			month--;
+			if (month == 0)
+			{
+				month = 12;
+				day = 31;
+				year--;
+			if (year == 0)
+				break ;
+			}
+			continue ;
+		}
+		else if (_map_database.find(year)->second.find(month)->second.find(day) == _map_database.find(year)->second.find(month)->second.end())
+		{
+			day--;
+			if (day == 0)
+				month--;
+			if (month == 0)
+			{
+				month = 12;
+				day = 31;
+				year--;
+				if (year == 0)
+					break ;
+				continue ;
+			}
+			if ((day == 0) && ((month < 8 && (month % 2)) || (month >= 8 && !(month % 2))))
+				day = 31;
+			else if ((day == 0) && (month == 2 && (!(year % 4))))
+				day = 29;
+			else if ((day == 0) && (month == 2 && ((year % 4))))
+				day = 28;
+			else if ((day == 0) && ((month < 8 && (!(month % 2))) || (month >= 8 && (month % 2))))
+				day = 30;
+			continue ;
+		}
+		flag = 1;
+		temp = _map_database[year][month][day];
+		break ;
+	}
+	if (flag == 0)
+		return (-1);
+	_result = data * temp;
+	return (0);
 }
 
 const char	*BitcoinExchange::ErrorOpeningDatabase::what(void) const throw()

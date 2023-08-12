@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:50:32 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/12 17:39:44 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/12 20:57:55 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ private:
 	int				_checkDateDatabase(void);
 	int				_checkYearMonthDatabase(unsigned int &month, unsigned int &day, unsigned int &year);
 	void			_processData(void);
-	int				_searchInDatabase(unsigned int &year, unsigned int &month, unsigned int &day, float &data);
+	int				_searchInDatabase(unsigned int &year, unsigned int &month, unsigned int &day, float const &data);
 	void			_findMinimunDatabase(void);
 };
 

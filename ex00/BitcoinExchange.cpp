@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:41:17 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/11 19:06:05 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/12 17:58:51 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ BitcoinExchange::BitcoinExchange(std::string &input_file)
 		throw (WrongFormatDatabase());
 	if (this->_checkFormatFile() == -1)
 		throw (WrongFormatFile());
+	_processData();
 	return ;
 }
 
@@ -68,9 +69,6 @@ int	BitcoinExchange::_checkFormatDatabase(void)
 
 int	BitcoinExchange::_checkFormatFile(void)
 {
-	size_t	i;
-
-	i = 1;
 	if (this->_storeDoc(this->_file, this->_file_doc, this->_lines_file) == -1)
 		return (-1);
 	if (this->_lines_file < 2)
@@ -80,12 +78,6 @@ int	BitcoinExchange::_checkFormatFile(void)
 		return (-1);
 	if (this->_parsed_file[0].compare("date | value"))
 		return (-1);
-	while (i < this->_lines_file)
-	{
-		if (this ->_checkLineFormatFile(this->_parsed_file[i]) == -1)
-			return (-1);
-		i++;
-	}
 	return (0);
 }
 
@@ -223,12 +215,14 @@ int	BitcoinExchange::_checkDateDatabase(void)
 	unsigned int	year;
 	unsigned int	month;
 	unsigned int	day;
+	float			data;
 
 	i = 1;
-	temp.clear();
+	data = 0;
 	while (i < _lines_database)
 	{
 		position = _findSpaceOrDash(_parsed_database[i]);
+		temp.clear();
 		temp = _parsed_database[i].substr(0, position);
 		std::istringstream	iss;
 		iss.str(temp);
@@ -245,12 +239,23 @@ int	BitcoinExchange::_checkDateDatabase(void)
 		if (iss.fail() == true || month > 12)
 			return (-1);
 		position += (_findSpaceOrDash(_parsed_database[i].substr((position + 1))) + 1);
+		temp.clear();
 		temp = _parsed_database[i].substr((position + 1), _findSpaceOrDash(_parsed_database[i].substr((position + 1))));
 		std::istringstream	iss3;
 		iss3.str(temp);
 		iss3 >> day;
 		if (iss.fail() == true || day > 31 || _checkYearMonthDatabase(month, day, year) == -1)
 			return (-1);
+		if (_parsed_database[i].find(',') == std::string::npos)
+			return (-1);
+		position = (_parsed_database[i].find(',') + 1);
+		temp = _parsed_database[i].substr(position);
+		std::istringstream	iss4;
+		iss4.str(temp);
+		iss4 >> data;
+		if (iss4.fail() == true)
+			return (-1);
+		_map_database[year][month][day] = data;
 		i++;
 	}
 	return (0);
@@ -283,14 +288,171 @@ int	BitcoinExchange::_checkYearMonthDatabase(unsigned int &month, unsigned int &
 	return (0);
 }
 
+void	BitcoinExchange::_processData(void)
+{
+	size_t			i;
+	std::string		temp;
+	size_t			position;
+	unsigned int	year;
+	unsigned int	month;
+	unsigned int	day;
+	float			data;
+
+	i = 1;
+	data = 0;
+	_findMinimunDatabase();
+	while (i < _lines_file)
+	{
+		if (this ->_checkLineFormatFile(_parsed_file[i]) == -1)
+		{
+			std::cout << "Error: bad input => " << _parsed_file[i] << std::endl;
+			i++;
+			continue ;
+		}
+		position = _findSpaceOrDash(_parsed_file[i]);
+		temp.clear();
+		temp = _parsed_file[i].substr(0, position);
+		std::istringstream	iss;
+		iss.str(temp);
+		iss >> year;
+		if (iss.fail() == true)
+		{
+			std::cout << "Error: bad input => " << _parsed_file[i] << std::endl;
+			i++;
+			continue ;
+		}
+		if (year < _minYear)
+		{
+			std::cout << "Error: bad input => " << _parsed_file[i] << std::endl;
+			i++;
+			continue ;
+		}
+		temp.clear();
+		temp = _parsed_file[i].substr((position + 1), _findSpaceOrDash(_parsed_file[i].substr((position + 1))));
+		std::istringstream	iss2;
+		iss2.str(temp);
+		iss2 >> month;
+		if (iss.fail() == true || month > 12)
+		{
+			std::cout << "Error: bad input => " << _parsed_file[i] << std::endl;
+			i++;
+			continue ;
+		}
+		position += (_findSpaceOrDash(_parsed_file[i].substr((position + 1))) + 1);
+		temp.clear();
+		temp = _parsed_file[i].substr((position + 1), _findSpaceOrDash(_parsed_file[i].substr((position + 1))));
+		std::istringstream	iss3;
+		iss3.str(temp);
+		iss3 >> day;
+		if (iss.fail() == true || day > 31 || _checkYearMonthDatabase(month, day, year) == -1)
+		{
+			std::cout << "Error: bad input => " << _parsed_file[i] << std::endl;
+			i++;
+			continue ;
+		}
+		position += 6;
+		temp.clear();
+		temp = _parsed_file[i].substr(position);
+		std::istringstream	iss4;
+		iss4.str(temp);
+		iss4 >> data;
+		if (iss4.fail() == true)
+		{
+			std::cout << "Error: floating point number overflowed" << std::endl;
+			i++;
+			continue ;
+		}
+		if (data < static_cast<float>(0))
+		{
+			std::cout << "Error: not a positive number" << std::endl;
+			i++;
+			continue ;
+		}
+		if (data > static_cast<float>(1000))
+		{
+			std::cout << "Error: too large a number" << std::endl;
+			i++;
+			continue ;
+		}
+		/*if (_searchInDatabase(year, month, day, data) == -1)
+		{
+			std::cout << "Error: not possible to find in database" << std::endl;
+			i++;
+			continue ;
+		}*/
+		i++;
+	}
+}
+
+void	BitcoinExchange::_findMinimunDatabase(void)
+{
+	map_database::iterator		it;
+	submap1_database::iterator	it2;
+	submap2_database::iterator	it3;
+	int							flag;
+
+	_minYear = 0;
+	_minMonth = 0;
+	_minDay = 0;
+	flag = 0;
+	it = _map_database.begin();
+	while (it != _map_database.end())
+	{
+		if (flag == 0)
+		{
+			_minYear = it->first;
+			flag = 1;
+		}
+		else
+		{
+			if (it->first < _minYear)
+				_minYear = it->first;
+		}
+		it++;
+	}
+	it2 = _map_database[_minYear].begin();
+	flag = 0;
+	while (it2 != _map_database[_minYear].end())
+	{
+		if (flag == 0)
+		{
+			_minMonth = it2->first;
+			flag = 1;
+		}
+		else
+		{
+			if (it2->first < _minMonth)
+				_minMonth = it2->first;
+		}
+		it2++;
+	}
+	flag = 0;
+	it3 = _map_database[_minYear][_minMonth].begin();
+	while (it3 != _map_database[_minYear][_minMonth].end())
+	{
+		if (flag == 0)
+		{
+			_minDay = it3->first;
+			flag = 1;
+		}
+		else
+		{
+			if (it3->first < _minDay)
+				_minDay = it3->first;
+		}
+		it3++;
+	}
+	std::cout << "min year:" << _minYear << ". min month:" << _minMonth << ". min day:" << _minDay << std::endl;
+}
+
 const char	*BitcoinExchange::ErrorOpeningDatabase::what(void) const throw()
 {
-	return ("Error: data.csv is not present in this directory or it could not be opened.");
+	return ("Error: could not open database.");
 }
 
 const char	*BitcoinExchange::ErrorOpeningFile::what(void) const throw()
 {
-	return ("Error: there was a problem trying to open the file provided as argument.");
+	return ("Error: could not open file.");
 }
 
 const char	*BitcoinExchange::WrongFormatDatabase::what(void) const throw()

@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:50:32 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/11 18:57:58 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/12 17:39:44 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,10 @@
 # include <fstream>
 # include <sstream>
 # include <stdexcept>
+
+typedef std::map<unsigned int, std::map <unsigned int, std::map <unsigned int, float> > >	map_database;
+typedef std::map <unsigned int, std::map <unsigned int, float> >	submap1_database;
+typedef std::map <unsigned int, float>	submap2_database;
 
 class	BitcoinExchange
 {
@@ -52,15 +56,19 @@ public:
 
 private:
 
-	std::map<std::string, float>	_map_database;
-	std::ifstream					_database;
-	std::ifstream					_file;
-	size_t							_lines_database;
-	size_t							_lines_file;
-	std::string						_database_doc;
-	std::string						_file_doc;
-	std::string						*_parsed_database;
-	std::string						*_parsed_file;
+	map_database	_map_database;
+	std::ifstream	_database;
+	std::ifstream	_file;
+	size_t			_lines_database;
+	size_t			_lines_file;
+	std::string		_database_doc;
+	std::string		_file_doc;
+	std::string		*_parsed_database;
+	std::string		*_parsed_file;
+	float			_result;
+	unsigned int	_minYear;
+	unsigned int	_minMonth;
+	unsigned int	_minDay;
 
 	BitcoinExchange(void);
 	BitcoinExchange(BitcoinExchange const &rhs);
@@ -76,6 +84,9 @@ private:
 	size_t			_findSpaceOrDash(std::string const &input);
 	int				_checkDateDatabase(void);
 	int				_checkYearMonthDatabase(unsigned int &month, unsigned int &day, unsigned int &year);
+	void			_processData(void);
+	int				_searchInDatabase(unsigned int &year, unsigned int &month, unsigned int &day, float &data);
+	void			_findMinimunDatabase(void);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 09:39:53 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/13 11:28:55 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/13 21:21:12 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,9 @@ private:
 	RPN(RPN const &rhs);
 
 	RPN	&operator=(RPN const &rhs);
+
+	std::string	*_splitcplusplus(std::string &input);
+	size_t		_countWords(std::string const &input);
 
 public:
 

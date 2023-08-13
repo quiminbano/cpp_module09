@@ -5,38 +5,35 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/29 14:42:02 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/13 11:19:33 by corellan         ###   ########.fr       */
+/*   Created: 2023/08/13 09:36:25 by corellan          #+#    #+#             */
+/*   Updated: 2023/08/13 11:19:27 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "BitcoinExchange.hpp"
-#include <iostream>
+#include "RPN.hpp"
 
 int	main(int ac, char **av)
 {
-	BitcoinExchange	*data;
-	std::string		tmp;
+	RPN			*calculations;
+	std::string	temp;
 
-	data = NULL;
+	calculations = NULL;
 	if (ac != 2)
 	{
-		if (ac == 1)
-			std::cerr << "Error: could not open file." << std::endl;
-		else
-			std::cerr << "Error: too many arguments." << std::endl;
+		std::cout << "Error" << std::endl;
 		return (1);
 	}
-	tmp = av[1];
+	temp.clear();
+	temp.append(av[1]);
 	try
 	{
-		data = new BitcoinExchange(tmp);
+		calculations = new RPN(temp);
 	}
-	catch(const std::exception& e)
+	catch(const std::exception &e)
 	{
-		std::cerr << e.what() << std::endl;
+		std::cout << e.what() << std::endl;
 		return (1);
 	}
-	delete data;
+	delete calculations;
 	return (0);
 }

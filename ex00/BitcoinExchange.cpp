@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:41:17 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/12 22:06:35 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/14 11:20:27 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,23 @@ BitcoinExchange::BitcoinExchange(std::string &input_file)
 	if (this->_file.fail() == true)
 		throw (ErrorOpeningFile());
 	if (this->_checkFormatDatabase() == -1)
+	{
+		this->_database.close();
+		this->_file.close();
+		if (this->_parsed_database)
+			delete [] this->_parsed_database;
 		throw (WrongFormatDatabase());
+	}
 	if (this->_checkFormatFile() == -1)
+	{
+		this->_database.close();
+		this->_file.close();
+		if (this->_parsed_database)
+			delete [] this->_parsed_database;
+		if (this->_parsed_file)
+			delete [] this->_parsed_file;
 		throw (WrongFormatFile());
+	}
 	_processData();
 	return ;
 }
@@ -484,9 +498,17 @@ int	BitcoinExchange::_searchInDatabase(unsigned int &year, unsigned int &month, 
 				month = 12;
 				day = 31;
 				year--;
-			if (year == 0)
-				break ;
+				if (year == 0)
+					break ;
 			}
+			else if (((month < 8 && (month % 2)) || (month >= 8 && !(month % 2))))
+				day = 31;
+			else if ((month == 2 && (!(year % 4))))
+				day = 29;
+			else if ((month == 2 && ((year % 4))))
+				day = 28;
+			else if (((month < 8 && (!(month % 2))) || (month >= 8 && (month % 2))))
+				day = 30;
 			continue ;
 		}
 		else if (_map_database.find(year)->second.find(month)->second.find(day) == _map_database.find(year)->second.find(month)->second.end())

@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 09:39:53 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/13 21:21:12 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/14 13:17:54 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,9 @@
 
 # include <stack>
 # include <iostream>
+# include <sstream>
 
-typedef	std::stack<unsigned int>	stack;
+typedef	std::stack<int>	stack;
 
 class RPN
 {
@@ -34,6 +35,10 @@ private:
 
 	std::string	*_splitcplusplus(std::string &input);
 	size_t		_countWords(std::string const &input);
+	size_t		_countSpaceOrTab(std::string const &input);
+	size_t		_findSpaceOrTab(std::string const &input);
+	int			_validateInput(std::string const &input);
+	int			_doOperations(void);
 
 public:
 

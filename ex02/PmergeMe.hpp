@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 17:53:42 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/15 19:15:32 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/15 21:42:23 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ private:
 	str_vector	_countArgument(char **av);
 	size_t		_countWords(std::string const &input);
 	str_vector	_splitcplusplus(std::string &input);
+	size_t		_countSpace(std::string const &input);
+	size_t		_findSpace(std::string const &input);
 
 public:
 

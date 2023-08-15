@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 18:24:57 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/15 19:19:21 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/15 22:27:28 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,36 @@ PmergeMe::~PmergeMe(void)
 
 int	PmergeMe::_fillContainers(char **av)
 {
-	str_vector	arrStr;
+	str_vector				arrStr;
+	str_vector				defStr;
+	str_vector				tempStr;
+	str_vector::iterator	it;
 
 	arrStr = _countArgument(av);
+	it = arrStr.begin();
+	while (it != arrStr.end())
+	{
+		if (_countWords((*it)) == 0)
+			return (-1);
+		else if (_countWords((*it)) == 1)
+			defStr.push_back((*it));
+		else
+		{
+			tempStr.clear();
+			tempStr = _splitcplusplus((*it));
+			for (str_vector::iterator temp_it = tempStr.begin(); temp_it != tempStr.end(); temp_it++)
+				defStr.push_back((*temp_it));
+		}
+		it++;
+	}
+	it = defStr.begin();
+	while (it != defStr.end())
+	{
+		std::cout << (*it) << ",";
+		it++;
+	}
+	std::cout << std::endl;
+	return (0);
 }
 
 str_vector	PmergeMe::_countArgument(char **av)
@@ -35,7 +62,7 @@ str_vector	PmergeMe::_countArgument(char **av)
 	size_t		i;
 	str_vector	temp;
 
-	i = 0;
+	i = 1;
 	while (av[i])
 	{
 		temp.push_back(av[i]);
@@ -71,7 +98,7 @@ str_vector	PmergeMe::_splitcplusplus(std::string &input)
 	while (i < words)
 	{
 		input = input.substr(_countSpace(input));
-		split[i] = input.substr(0, _findSpace(input));
+		split.push_back(input.substr(0, _findSpace(input)));
 		if ((i + 1) < words)
 			input = input.substr(_findSpace(input) + _countSpace(input.substr(_findSpace(input))));
 		i++;
@@ -95,4 +122,9 @@ size_t	PmergeMe::_findSpace(std::string const &input)
 
 	space = input.find(' ');
 	return (space);
+}
+
+const char	*PmergeMe::Error::what(void) const throw()
+{
+	return ("Error");
 }

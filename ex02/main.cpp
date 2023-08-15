@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 18:18:30 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/15 18:24:42 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/15 22:26:19 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ int	main(int ac, char **av)
 
 	if (ac == 1)
 	{
-		std::cout << "Error\n" << std::endl;
+		std::cout << "Error" << std::endl;
+		return (1);
 	}
 	try
 	{

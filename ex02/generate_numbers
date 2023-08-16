@@ -1,14 +1,11 @@
 #!/bin/bash
-
 count=0
 max_numbers=6000
-
-# Generar números aleatorios únicos y mostrarlos en pantalla
 while [ $count -lt $max_numbers ]; do
-    random_num=$(jot -r 1 1 10000)  # Generar un número aleatorio entre 1 y 10000
+    random_num=$(jot -r 1 1 10000)
     if ! [[ $numbers =~ (^|[[:space:]])$random_num($|[[:space:]]) ]]; then
         if [ $count -gt 0 ]; then
-            echo -n " "  # Imprimir un espacio si no es el primer número
+            echo -n " "
         fi
         echo -n "$random_num"
         numbers+=" $random_num"

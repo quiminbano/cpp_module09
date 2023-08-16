@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 17:53:42 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/16 15:19:19 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/16 21:38:35 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ private:
 	size_t				_timeVectorLast;
 	size_t				_timeDequeInit;
 	size_t				_timeDequeLast;
+	size_t				_timeProcessInit;
+	size_t				_timeProcessLast;
 	static unsigned int	_nb;
 
 	PmergeMe(void);

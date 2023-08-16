@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 18:24:57 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/16 17:13:11 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/16 21:40:45 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 
 PmergeMe::PmergeMe(char **av)
 {
+	_timeProcessInit = clock();
 	if (_fillContainers(av) == -1)
 		throw (Error());
 	if (_checkRepeated() == -1)
 		throw (Error());
-	std::cout << "Before:  ";
+	_timeProcessLast = clock();
+	std::cout << "Before:               ";
 	for (vector::iterator it = _vector.begin(); it != _vector.end(); it++)
 		std::cout << (*it) << " ";
 	_timeVectorInit = clock();
@@ -28,14 +30,20 @@ PmergeMe::PmergeMe(char **av)
 	_doAlgorithm(_deque, 0, ((_deque.size() - 1)));
 	_timeDequeLast = clock();
 	std::cout << std::endl;
-	std::cout << "After:   ";
+	std::cout << "After (std::vector):  ";
+	for (vector::iterator it = _vector.begin(); it != _vector.end(); it++)
+		std::cout << (*it) << " ";
+	std::cout << std::endl;
+	std::cout << "After (std::deque):   ";
 	for (deque::iterator it = _deque.begin(); it != _deque.end(); it++)
 		std::cout << (*it) << " ";
 	std::cout << std::endl;
 	std::cout << "Time to process a range of " << _vector.size() << " elements with std::vector : ";
-	std::cout << static_cast<double>(((_timeVectorLast - _timeVectorInit) / CLOCKS_PER_SEC) * 1000) << " us" << std::endl;
+	std::cout << (((static_cast<double>(_timeVectorLast - _timeVectorInit)) / CLOCKS_PER_SEC) * static_cast<double>(1000)) << " ms" << std::endl;
 	std::cout << "Time to process a range of " << _deque.size() << " elements with std::deque : ";
-	std::cout << static_cast<double>(((_timeDequeLast - _timeDequeInit) / CLOCKS_PER_SEC) * 1000) << " us" << std::endl;
+	std::cout << (((static_cast<double>(_timeDequeLast - _timeDequeInit)) / CLOCKS_PER_SEC) * static_cast<double>(1000)) << " ms" << std::endl;
+	std::cout << "Time to process the data passed as input : ";
+	std::cout << (((static_cast<double>(_timeProcessLast - _timeProcessInit)) / CLOCKS_PER_SEC) * static_cast<double>(1000)) << " ms" << std::endl;
 	return ;
 }
 
@@ -251,7 +259,6 @@ void	PmergeMe::_merge(vector &container, size_t left, size_t middle, size_t righ
 		idxR++;
 		i++;
 	}	
-	return ;
 	return ;
 }
 

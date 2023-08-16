@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 17:53:42 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/15 21:42:23 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/16 15:19:19 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 # include <string>
 # include <stdexcept>
 # include <iostream>
+# include <sstream>
+# include <ctime>
 
 typedef std::deque<unsigned int>	deque;
 typedef std::vector<unsigned int>	vector;
@@ -27,8 +29,13 @@ class PmergeMe
 {
 private:
 
-	deque	_deque;
-	vector	_vector;
+	deque				_deque;
+	vector				_vector;
+	size_t				_timeVectorInit;
+	size_t				_timeVectorLast;
+	size_t				_timeDequeInit;
+	size_t				_timeDequeLast;
+	static unsigned int	_nb;
 
 	PmergeMe(void);
 	PmergeMe(PmergeMe const &rhs);
@@ -41,6 +48,13 @@ private:
 	str_vector	_splitcplusplus(std::string &input);
 	size_t		_countSpace(std::string const &input);
 	size_t		_findSpace(std::string const &input);
+	int			_checkRepeated(void);
+	void		_doAlgorithm(vector &container, size_t left, size_t right);
+	void		_doAlgorithm(deque &container, size_t left, size_t right);
+	void		_merge(vector &container, size_t left, size_t middle, size_t right);
+	void		_merge(deque &container, size_t left, size_t middle, size_t right);
+	void		_doInsertion(vector &container, size_t left, size_t right);
+	void		_doInsertion(deque &container, size_t left, size_t right);
 
 public:
 

@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 18:24:57 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/15 22:27:28 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/16 17:13:11 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,27 @@ PmergeMe::PmergeMe(char **av)
 {
 	if (_fillContainers(av) == -1)
 		throw (Error());
+	if (_checkRepeated() == -1)
+		throw (Error());
+	std::cout << "Before:  ";
+	for (vector::iterator it = _vector.begin(); it != _vector.end(); it++)
+		std::cout << (*it) << " ";
+	_timeVectorInit = clock();
+	_doAlgorithm(_vector, 0, ((_vector.size() - 1)));
+	_timeVectorLast = clock();
+	_timeDequeInit = clock();
+	_doAlgorithm(_deque, 0, ((_deque.size() - 1)));
+	_timeDequeLast = clock();
+	std::cout << std::endl;
+	std::cout << "After:   ";
+	for (deque::iterator it = _deque.begin(); it != _deque.end(); it++)
+		std::cout << (*it) << " ";
+	std::cout << std::endl;
+	std::cout << "Time to process a range of " << _vector.size() << " elements with std::vector : ";
+	std::cout << static_cast<double>(((_timeVectorLast - _timeVectorInit) / CLOCKS_PER_SEC) * 1000) << " us" << std::endl;
+	std::cout << "Time to process a range of " << _deque.size() << " elements with std::deque : ";
+	std::cout << static_cast<double>(((_timeDequeLast - _timeDequeInit) / CLOCKS_PER_SEC) * 1000) << " us" << std::endl;
+	return ;
 }
 
 PmergeMe::~PmergeMe(void)
@@ -28,7 +49,9 @@ int	PmergeMe::_fillContainers(char **av)
 	str_vector				arrStr;
 	str_vector				defStr;
 	str_vector				tempStr;
+	std::istringstream		iss;
 	str_vector::iterator	it;
+	unsigned int			temp;
 
 	arrStr = _countArgument(av);
 	it = arrStr.begin();
@@ -47,13 +70,20 @@ int	PmergeMe::_fillContainers(char **av)
 		}
 		it++;
 	}
+	tempStr.clear();
+	arrStr.clear();
 	it = defStr.begin();
 	while (it != defStr.end())
 	{
-		std::cout << (*it) << ",";
+		iss.clear();
+		iss.str((*it));
+		iss >> temp;
+		if (iss.fail() == true)
+			return (-1);
+		_vector.push_back(temp);
+		_deque.push_back(temp);
 		it++;
 	}
-	std::cout << std::endl;
 	return (0);
 }
 
@@ -124,7 +154,196 @@ size_t	PmergeMe::_findSpace(std::string const &input)
 	return (space);
 }
 
+int	PmergeMe::_checkRepeated(void)
+{
+	deque::iterator		it_deque;
+	vector::iterator	it_vector;
+	size_t				counter;
+
+	it_deque = _deque.begin();
+	while (it_deque != _deque.end())
+	{
+		it_vector = _vector.begin();
+		counter = 0;
+		while (it_vector != _vector.end())
+		{
+			if ((*it_deque) == (*it_vector))
+				counter++;
+			if (counter > 1)
+				return (-1);
+			it_vector++;
+		}
+		it_deque++;
+	}
+	return (0);
+}
+
+void	PmergeMe::_doAlgorithm(vector &container, size_t left, size_t right)
+{
+	size_t	middle;
+
+	middle = 0;
+	if ((right - left) > _nb)
+	{
+		middle = (left + ((right - left) / 2));
+		_doAlgorithm(container, left, middle);
+		_doAlgorithm(container, (middle + 1), right);
+		_merge(container, left, middle, right);
+	}
+	else
+		_doInsertion(container, left, right);
+	return ;
+}
+
+void	PmergeMe::_doAlgorithm(deque &container, size_t left, size_t right)
+{
+	size_t	middle;
+
+	middle = 0;
+	if ((right - left) > _nb)
+	{
+		middle = (left + ((right - left) / 2));
+		_doAlgorithm(container, left, middle);
+		_doAlgorithm(container, (middle + 1), right);
+		_merge(container, left, middle, right);
+	}
+	else
+		_doInsertion(container, left, right);
+	return ;
+}
+
+void	PmergeMe::_merge(vector &container, size_t left, size_t middle, size_t right)
+{
+	size_t	n1;
+	size_t	n2;
+	size_t	idxL;
+	size_t	idxR;
+	size_t	i;
+
+	vector	tempLeft(container.begin() + left, (container.begin() + middle + 1));
+	vector	tempRight((container.begin() + middle + 1), (container.begin() + right + 1));
+	n1 = (middle - left + 1);
+	n2 = (right - middle);
+	idxL = 0;
+	idxR = 0;
+	for (i = left; (idxL < n1 && idxR < n2); i++)
+	{
+		if (tempLeft[idxL] > tempRight[idxR])
+		{
+			container[i] = tempRight[idxR];
+			idxR++;
+		}
+		else
+		{
+			container[i] = tempLeft[idxL];
+			idxL++;
+		}
+	}
+	while (idxL < n1)
+	{
+		container[i] = tempLeft[idxL];
+		idxL++;
+		i++;
+	}
+	while (idxR < n2)
+	{
+		container[i] = tempRight[idxR];
+		idxR++;
+		i++;
+	}	
+	return ;
+	return ;
+}
+
+void	PmergeMe::_merge(deque &container, size_t left, size_t middle, size_t right)
+{
+	size_t	n1;
+	size_t	n2;
+	size_t	idxL;
+	size_t	idxR;
+	size_t	i;
+
+	deque	tempLeft(container.begin() + left, (container.begin() + middle + 1));
+	deque	tempRight((container.begin() + middle + 1), (container.begin() + right + 1));
+	n1 = (middle - left + 1);
+	n2 = (right - middle);
+	idxL = 0;
+	idxR = 0;
+	for (i = left; (idxL < n1 && idxR < n2); i++)
+	{
+		if (tempLeft[idxL] > tempRight[idxR])
+		{
+			container[i] = tempRight[idxR];
+			idxR++;
+		}
+		else
+		{
+			container[i] = tempLeft[idxL];
+			idxL++;
+		}
+	}
+	while (idxL < n1)
+	{
+		container[i] = tempLeft[idxL];
+		idxL++;
+		i++;
+	}
+	while (idxR < n2)
+	{
+		container[i] = tempRight[idxR];
+		idxR++;
+		i++;
+	}	
+	return ;
+}
+
+void	PmergeMe::_doInsertion(vector &container, size_t left, size_t right)
+{
+	size_t			i;
+	size_t			j;
+	unsigned int	current;
+
+	i = left;
+	while (i < right)
+	{
+		current = container[i + 1];
+		j = (i + 1);
+		while ((j > left) && (container[j - 1] > current))
+		{
+			container[j] = container[j - 1];
+			j--;
+		}
+		container[j] = current;
+		i++;
+	}
+	return ;
+}
+
+void	PmergeMe::_doInsertion(deque &container, size_t left, size_t right)
+{
+	size_t			i;
+	size_t			j;
+	unsigned int	current;
+
+	i = left;
+	while (i < right)
+	{
+		current = container[i + 1];
+		j = (i + 1);
+		while ((j > left) && (container[j - 1] > current))
+		{
+			container[j] = container[j - 1];
+			j--;
+		}
+		container[j] = current;
+		i++;
+	}
+	return ;
+}
+
 const char	*PmergeMe::Error::what(void) const throw()
 {
 	return ("Error");
 }
+
+unsigned int	PmergeMe::_nb = 5;

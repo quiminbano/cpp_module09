@@ -6,53 +6,54 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:41:17 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/14 11:20:27 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/17 10:22:01 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "BitcoinExchange.hpp"
 #include <iostream>
 
-BitcoinExchange::BitcoinExchange(std::string &input_file)
+BitcoinExchange::BitcoinExchange(void)
 {
 	this->_parsed_database = NULL;
 	this->_parsed_file = NULL;
-	this->_database.open("data.csv", std::ifstream::in);
-	if (this->_database.fail() == true)
-		throw (ErrorOpeningDatabase());
-	this->_file.open(input_file, std::ifstream::in);
-	if (this->_file.fail() == true)
-		throw (ErrorOpeningFile());
-	if (this->_checkFormatDatabase() == -1)
-	{
-		this->_database.close();
-		this->_file.close();
-		if (this->_parsed_database)
-			delete [] this->_parsed_database;
-		throw (WrongFormatDatabase());
-	}
-	if (this->_checkFormatFile() == -1)
-	{
-		this->_database.close();
-		this->_file.close();
-		if (this->_parsed_database)
-			delete [] this->_parsed_database;
-		if (this->_parsed_file)
-			delete [] this->_parsed_file;
-		throw (WrongFormatFile());
-	}
-	_processData();
+	this->_fileFlag = 0;
+	this->_databaseFlag = 0;
 	return ;
 }
 
 BitcoinExchange::~BitcoinExchange(void)
 {
-	this->_database.close();
-	this->_file.close();
+	if (this->_databaseFlag == 1)
+		this->_database.close();
+	if (this->_fileFlag == 1)
+		this->_file.close();
 	if (this->_parsed_database)
 		delete [] this->_parsed_database;
 	if (this->_parsed_file)
 		delete [] this->_parsed_file;
+	return ;
+}
+
+void	BitcoinExchange::initialize(std::string &input_file)
+{
+	this->_parsed_database = NULL;
+	this->_parsed_file = NULL;
+	this->_fileFlag = 0;
+	this->_databaseFlag = 0;
+	this->_database.open("data.csv", std::ifstream::in);
+	if (this->_database.fail() == true)
+		throw (ErrorOpeningDatabase());
+	this->_databaseFlag = 1;
+	this->_file.open(input_file, std::ifstream::in);
+	if (this->_file.fail() == true)
+		throw (ErrorOpeningFile());
+	this->_fileFlag = 1;
+	if (this->_checkFormatDatabase() == -1)
+		throw (WrongFormatDatabase());
+	if (this->_checkFormatFile() == -1)
+		throw (WrongFormatFile());
+	_processData();
 	return ;
 }
 
@@ -212,6 +213,8 @@ int	BitcoinExchange::_checkLineFormatFile(std::string const &line)
 	if (line[i] != ' ')
 		return (-1);
 	i++;
+	if (line[i] == 0)
+		return (-1);
 	if (line[i] == '+' || line[i] == '-')
 		i++;
 	while (std::isdigit(line[i]))

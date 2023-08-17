@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 18:18:30 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/16 08:47:55 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/17 10:45:26 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,8 @@
 
 int	main(int ac, char **av)
 {
-	PmergeMe	*merge;
+	PmergeMe	merge;
 
-	merge = NULL;
 	if (ac == 1)
 	{
 		std::cout << "Error" << std::endl;
@@ -24,13 +23,12 @@ int	main(int ac, char **av)
 	}
 	try
 	{
-		merge = new PmergeMe(av);
+		merge.initialize(av);
 	}
 	catch(const std::exception& e)
 	{
 		std::cout << e.what() << std::endl;
 		return (1);
 	}
-	delete merge;
 	return (0);
 }

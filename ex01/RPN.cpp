@@ -6,36 +6,14 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 10:34:30 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/14 13:25:55 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/17 10:33:27 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RPN.hpp"
 
-RPN::RPN(std::string &input) : _input(input), _parsed_input(NULL), _arguments(0)
+RPN::RPN(void) : _parsed_input(NULL), _arguments(0)
 {
-	size_t	i;
-
-	i = 0;
-	_parsed_input = _splitcplusplus(input);
-	if (!_parsed_input)
-		throw (Error());
-	while (i < _arguments)
-	{
-		if (_validateInput(_parsed_input[i]) == -1)
-		{
-			if (_parsed_input)
-				delete [] _parsed_input;
-			throw(Error());
-		}
-		i++;
-	}
-	if (_doOperations() == -1)
-	{
-		if (_parsed_input)
-			delete [] _parsed_input;
-		throw(Error());
-	}
 	return ;
 }
 
@@ -43,6 +21,26 @@ RPN::~RPN(void)
 {
 	if (_parsed_input)
 		delete [] _parsed_input;
+	return ;
+}
+
+void	RPN::initialize(std::string &input)
+{
+	size_t	i;
+
+	i = 0;
+	_input = input;
+	_parsed_input = _splitcplusplus(input);
+	if (!_parsed_input)
+		throw (Error());
+	while (i < _arguments)
+	{
+		if (_validateInput(_parsed_input[i]) == -1)
+			throw(Error());
+		i++;
+	}
+	if (_doOperations() == -1)
+		throw(Error());
 	return ;
 }
 

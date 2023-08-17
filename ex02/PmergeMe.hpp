@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 17:53:42 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/16 21:38:35 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/17 10:44:35 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ private:
 	size_t				_timeProcessLast;
 	static unsigned int	_nb;
 
-	PmergeMe(void);
 	PmergeMe(PmergeMe const &rhs);
 	
 	PmergeMe	&operator=(PmergeMe const &rhs);
@@ -65,8 +64,10 @@ public:
 		virtual const char	*what(void) const throw();
 	};
 
-	PmergeMe(char **argv);
+	PmergeMe(void);
 	~PmergeMe(void);
+
+	void	initialize(char **av);
 
 };
 

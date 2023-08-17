@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 09:39:53 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/14 13:17:54 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/17 10:29:37 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ private:
 	std::string		*_parsed_input;
 	unsigned int	_arguments;
 
-	RPN(void);
 	RPN(RPN const &rhs);
 
 	RPN	&operator=(RPN const &rhs);
@@ -47,8 +46,10 @@ public:
 		virtual const char	*what(void) const throw();
 	};
 
-	RPN(std::string	&input);
+	RPN(void);
 	~RPN(void);
+
+	void	initialize(std::string &input);
 };
 
 #endif

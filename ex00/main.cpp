@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:42:02 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/14 11:07:00 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/17 10:13:25 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,9 @@
 
 int	main(int ac, char **av)
 {
-	BitcoinExchange	*data;
+	BitcoinExchange	data;
 	std::string		tmp;
 
-	data = NULL;
 	if (ac != 2)
 	{
 		if (ac == 1)
@@ -30,13 +29,12 @@ int	main(int ac, char **av)
 	tmp = av[1];
 	try
 	{
-		data = new BitcoinExchange(tmp);
+		data.initialize(tmp);
 	}
-	catch(const std::exception& e)
+	catch(const std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 		return (1);
 	}
-	delete data;
 	return (0);
 }

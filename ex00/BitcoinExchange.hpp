@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/29 14:50:32 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/12 20:57:55 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/17 10:04:16 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,10 @@ public:
 
 		virtual const char	*what(void) const throw();
 	};
-	BitcoinExchange(std::string &input_file);
+	BitcoinExchange(void);
 	~BitcoinExchange(void);
+
+	void	initialize(std::string &input_file);
 
 private:
 
@@ -69,8 +71,9 @@ private:
 	unsigned int	_minYear;
 	unsigned int	_minMonth;
 	unsigned int	_minDay;
+	unsigned int	_databaseFlag;
+	unsigned int	_fileFlag;
 
-	BitcoinExchange(void);
 	BitcoinExchange(BitcoinExchange const &rhs);
 
 	BitcoinExchange	operator=(BitcoinExchange const &rhs);

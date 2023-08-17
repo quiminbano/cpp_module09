@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 09:36:25 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/13 11:19:27 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/17 10:34:38 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,9 @@
 
 int	main(int ac, char **av)
 {
-	RPN			*calculations;
+	RPN			calculations;
 	std::string	temp;
 
-	calculations = NULL;
 	if (ac != 2)
 	{
 		std::cout << "Error" << std::endl;
@@ -27,13 +26,12 @@ int	main(int ac, char **av)
 	temp.append(av[1]);
 	try
 	{
-		calculations = new RPN(temp);
+		calculations.initialize(temp);
 	}
 	catch(const std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
 		return (1);
 	}
-	delete calculations;
 	return (0);
 }

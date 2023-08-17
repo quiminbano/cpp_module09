@@ -6,13 +6,23 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 18:24:57 by corellan          #+#    #+#             */
-/*   Updated: 2023/08/16 21:40:45 by corellan         ###   ########.fr       */
+/*   Updated: 2023/08/17 10:45:01 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
 
-PmergeMe::PmergeMe(char **av)
+PmergeMe::PmergeMe(void)
+{
+	return ;
+}
+
+PmergeMe::~PmergeMe(void)
+{
+	return ;
+}
+
+void	PmergeMe::initialize(char **av)
 {
 	_timeProcessInit = clock();
 	if (_fillContainers(av) == -1)
@@ -44,11 +54,6 @@ PmergeMe::PmergeMe(char **av)
 	std::cout << (((static_cast<double>(_timeDequeLast - _timeDequeInit)) / CLOCKS_PER_SEC) * static_cast<double>(1000)) << " ms" << std::endl;
 	std::cout << "Time to process the data passed as input : ";
 	std::cout << (((static_cast<double>(_timeProcessLast - _timeProcessInit)) / CLOCKS_PER_SEC) * static_cast<double>(1000)) << " ms" << std::endl;
-	return ;
-}
-
-PmergeMe::~PmergeMe(void)
-{
 	return ;
 }
 
